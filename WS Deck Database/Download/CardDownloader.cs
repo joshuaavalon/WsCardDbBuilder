@@ -79,14 +79,20 @@ namespace WsDeckDatabase.Download
                 card.FirstChara = charaList[0];
                 card.SecondChara = charaList[1];
             }
-            
-            card.Text = tableNode.SelectSingleNode("//th[text()='テキスト']/following-sibling::td").InnerHtml.ReplaceBr().Trim();
+
+            var rgx = new Regex(@"<font[^>]+>");
+            card.Text =
+                rgx.Replace(
+                    tableNode.SelectSingleNode("//th[text()='テキスト']/following-sibling::td")?
+                        .InnerHtml.ReplaceBr()
+                        .Trim() ?? "", "");
+            card.Text = card.Text.Replace("</font>", "");
             if(card.Text.Contains("<img"))
             {
             card.Text = ReplaceImg(card.Text);
             }
-
-            var rgx = new Regex(@"<img[^>]+>");
+            
+            rgx = new Regex(@"<img[^>]+>");
             card.Flavor =
                 rgx.Replace(
                     tableNode.SelectSingleNode("//th[text()='フレーバー']/following-sibling::td")?
