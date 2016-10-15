@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using HtmlAgilityPack;
 using Type = WsDeckDatabase.Model.Type;
 
 namespace WsDeckDatabase.Download
@@ -65,15 +66,12 @@ namespace WsDeckDatabase.Download
             return temp;
         }
 
-
-        /// <summary>
-        ///     Remove html br tag.
-        /// </summary>
-        /// <param name="html">sting to be handle</param>
-        /// <returns>Resulted string</returns>
-        public static string ReplaceBr(this string html)
+        public static void ReplaceBrNode(this HtmlNode parentNode)
         {
-            return html.Replace("<br/>", "\n").Replace("<br>", "\n");
+            foreach (var brNode in parentNode.Descendants("br").ToList())
+            {
+                brNode.ParentNode.ReplaceChild(HtmlNode.CreateNode("\n"), brNode);
+            }
         }
     }
 }

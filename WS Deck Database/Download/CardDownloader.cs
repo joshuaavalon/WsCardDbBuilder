@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 using HtmlAgilityPack;
 using WsDeckDatabase.Model;
 
@@ -43,7 +42,7 @@ namespace WsDeckDatabase.Download
             card.Rarity = tableNode.SelectSingleNode("//td[@class='cell_4']")?.InnerText?.Trim();
             card.Expansion = tableNode.SelectSingleNode("//th[text()='エクスパンション']/following-sibling::td")?
                 .InnerText.Trim();
-            if(card.Expansion == "シリーズ セカンドシーズン")
+            if (card.Expansion == "シリーズ セカンドシーズン")
             {
                 card.Expansion = "<物語>" + card.Expansion;
             }
@@ -80,28 +79,54 @@ namespace WsDeckDatabase.Download
                 card.SecondChara = charaList[1];
             }
 
-            var rgx = new Regex(@"<font[^>]+>");
-            card.Text =
-                rgx.Replace(
-                    tableNode.SelectSingleNode("//th[text()='テキスト']/following-sibling::td")?
-                        .InnerHtml.ReplaceBr()
-                        .Trim() ?? "", "");
-            card.Text = card.Text.Replace("</font>", "");
-            if(card.Text.Contains("<img"))
+            var textNode = tableNode.SelectSingleNode("//th[text()='テキスト']/following-sibling::td");
+            foreach (var imgNode in textNode.Descendants("img").ToList())
             {
-            card.Text = ReplaceImg(card.Text);
+                var imgText = "";
+                switch (Path.GetFileNameWithoutExtension(imgNode.GetAttributeValue("src", "")))
+                {
+                    case "bounce":
+                        imgText = "リターン";
+                        break;
+                    case "stock":
+                        imgText = "プール";
+                        break;
+                    case "salvage":
+                        imgText = "カムバック";
+                        break;
+                    case "draw":
+                        imgText = "ドロー";
+                        break;
+                    case "treasure":
+                        imgText = "トレジャー";
+                        break;
+                    case "shot":
+                        imgText = "ショット";
+                        break;
+                    case "gate":
+                        imgText = "ゲート";
+                        break;
+                    default:
+                        Console.WriteLine($"{serial}:Unknown Image");
+                        break;
+                }
+                if (!string.IsNullOrWhiteSpace(imgText))
+                    imgNode.ParentNode.ReplaceChild(HtmlNode.CreateNode($"【{imgText}】"), imgNode);
             }
-            
-            rgx = new Regex(@"<img[^>]+>");
-            card.Flavor =
-                rgx.Replace(
-                    tableNode.SelectSingleNode("//th[text()='フレーバー']/following-sibling::td")?
-                        .InnerHtml.ReplaceBr()
-                        .Trim() ?? "", "");
-            var image =
-                tableNode.SelectSingleNode("//td[@class='graphic']/img")
-                    .GetAttributeValue("src", "")
-                    .Trim();
+            textNode.ReplaceBrNode();
+
+            foreach (var fontNode in textNode.Descendants("font").ToList())
+            {
+                fontNode.ParentNode.ReplaceChild(HtmlNode.CreateNode(fontNode.InnerText), fontNode);
+            }
+
+            card.Text = textNode.InnerText.Trim();
+
+            var flavorNode = tableNode.SelectSingleNode("//th[text()='フレーバー']/following-sibling::td");
+            flavorNode.ReplaceBrNode();
+            card.Flavor = flavorNode.InnerText;
+
+            var image = tableNode.SelectSingleNode("//td[@class='graphic']/img").GetAttributeValue("src", "").Trim();
             if (!image.Contains(@"http://ws-tcg.com"))
                 image = @"http://ws-tcg.com" + image;
             card.Image = image;
@@ -151,19 +176,6 @@ namespace WsDeckDatabase.Download
                     split[i] = "";
             }
             return split;
-        }
-
-        private string ReplaceImg(string text)
-        {
-            text = text.Replace(@"<img src='../cardlist/partimages/bounce.gif'>", "リターン");
-            text = text.Replace(@"<img src='../cardlist/partimages/stock.gif'>", "プール");
-            text = text.Replace(@"<img src='../cardlist/partimages/salvage.gif'>", "カムバック");
-            text = text.Replace(@"<img src='../cardlist/partimages/draw.gif'>", "ドロー");
-            text = text.Replace(@"<img src='../cardlist/partimages/treasure.gif'>", "トレジャー");
-            text = text.Replace(@"<img src='../cardlist/partimages/shot.gif'>", "ショット");
-            text = text.Replace(@"<img src='../cardlist/partimages/gate.gif'>", "ゲート");
-        
-            return text;
         }
     }
 }

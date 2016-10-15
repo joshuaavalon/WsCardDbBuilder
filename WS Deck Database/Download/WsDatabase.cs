@@ -2,18 +2,29 @@
 using System.Data.SQLite;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using WsDeckDatabase.Model;
 
 namespace WsDeckDatabase.Download
 {
-    internal class WsDatabase :IEqualityComparer<Card>
+    internal class WsDatabase : IEqualityComparer<Card>
     {
         private const string DatabaseName = "wsdb.db";
+
+        public bool Equals(Card x, Card y)
+        {
+            return x.Serial == y.Serial;
+        }
+
+        public int GetHashCode(Card obj)
+        {
+            return obj.Serial.GetHashCode();
+        }
+
         public void Save(IEnumerable<Card> cardList)
         {
-            if (!File.Exists(DatabaseName))
-                SQLiteConnection.CreateFile(DatabaseName);
+            if (File.Exists(DatabaseName))
+                File.Delete(DatabaseName);
+            SQLiteConnection.CreateFile(DatabaseName);
             var sqLiteConnection = new SQLiteConnection("Data source=WsDb.db");
             sqLiteConnection.Open();
             using (var command = sqLiteConnection.CreateCommand())
@@ -60,16 +71,6 @@ namespace WsDeckDatabase.Download
                 transaction.Commit();
             }
             sqLiteConnection.Close();
-        }
-
-        public bool Equals(Card x, Card y)
-        {
-            return x.Serial == y.Serial;
-        }
-
-        public int GetHashCode(Card obj)
-        {
-            return obj.Serial.GetHashCode();
         }
     }
 }

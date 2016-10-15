@@ -56,8 +56,4 @@ namespace WsDeckDatabase
             }
         }
     }
-
-    internal class CardComparator
-    {
-    }
 }
