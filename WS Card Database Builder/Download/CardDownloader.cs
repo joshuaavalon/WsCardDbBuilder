@@ -3,26 +3,63 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using HtmlAgilityPack;
-using WsDeckDatabase.Model;
+using Newtonsoft.Json;
+using WsCardDatabaseBuilder.Model;
 
-namespace WsDeckDatabase.Download
+namespace WsCardDatabaseBuilder.Download
 {
     internal class CardDownloader
     {
         private readonly string _query;
         private readonly HtmlWeb _web;
-
+        private readonly Option _option;
+        private readonly string _cachePath;
         /// <summary>
         ///     Unwanted string to be removed.
         /// </summary>
         public IEnumerable<string> UnwantedString = new[] {"-", "－", "（バニラ）"};
 
-        public CardDownloader(string query = @"http://ws-tcg.com/cardlist/?cardno=")
+        public CardDownloader(Option option, string cachePath, string query = @"http://ws-tcg.com/cardlist/?cardno=")
         {
             if (query == null)
                 throw new ArgumentNullException(nameof(query));
+            _cachePath = cachePath;
+            _option = option;
             _query = query;
             _web = new HtmlWeb();
+        }
+
+        public IEnumerable<Card> Download(IReadOnlyCollection<string> serials, IList<string> nullList)
+        {
+            Directory.CreateDirectory(_cachePath);
+            var count = 0;
+            Console.Out.Write("Download cards...");
+            using (var progressBar = new ProgressBar())
+            {
+                foreach (var serial in serials)
+                {
+                    var fileName = serial.Replace("/", "").Replace("-", "");
+                    var path = $@"{_cachePath}\{fileName}.json";
+                    Card card;
+                    if (!_option.ForceDownload && File.Exists(path))
+                    {
+                        card = JsonConvert.DeserializeObject<Card>(File.ReadAllText(path));
+                    }
+                    else
+                    {
+                        card = Download(serial);
+                        if (card != null && !_option.DisableCache)
+                            File.WriteAllText(path, JsonConvert.SerializeObject(card, Formatting.Indented));
+                    }
+
+                    if (card != null)
+                        yield return card;
+                    else
+                        nullList.Add(serial);
+                    progressBar.Report((double)++count / serials.Count);
+                }
+            }
+            Console.WriteLine("Done.");
         }
 
         public Card Download(string serial)
@@ -32,7 +69,6 @@ namespace WsDeckDatabase.Download
                 throw new ArgumentNullException(nameof(serial));
             var url = _query + serial;
             var htmlDoc = _web.Load(url);
-            if (htmlDoc.ParseErrors != null && htmlDoc.ParseErrors.Any()) return null;
             var documentNode = htmlDoc.DocumentNode;
             var tableNode = documentNode?.SelectSingleNode("//table[@class='status']");
             if (tableNode == null) return null;

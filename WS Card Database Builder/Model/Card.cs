@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace WsDeckDatabase.Model
+namespace WsCardDatabaseBuilder.Model
 {
     internal class Card
     {

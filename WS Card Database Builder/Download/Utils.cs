@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using HtmlAgilityPack;
-using Type = WsDeckDatabase.Model.Type;
+using Type = WsCardDatabaseBuilder.Model.Type;
 
-namespace WsDeckDatabase.Download
+namespace WsCardDatabaseBuilder.Download
 {
     internal static class Utils
     {
@@ -45,11 +45,11 @@ namespace WsDeckDatabase.Download
         /// </summary>
         /// <param name="text">Text to be prased</param>
         /// <returns>Card type</returns>
-        public static Type ParseType(this string text)
+        public static Model.Type ParseType(this string text)
         {
             if (text.Equals("イベント"))
-                return Type.Event;
-            return text.Equals("クライマックス") ? Type.Climax : Type.Character;
+                return Model.Type.Event;
+            return text.Equals("クライマックス") ? Model.Type.Climax : Model.Type.Character;
         }
 
 

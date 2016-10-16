@@ -1,4 +1,4 @@
-﻿namespace WsDeckDatabase.Model
+﻿namespace WsCardDatabaseBuilder.Model
 {
     public enum Side
     {
