@@ -10,14 +10,28 @@ namespace WsCardDatabaseBuilder.Download
 {
     internal class SerialDownloader
     {
-        private const string Url = @"http://ws-tcg.com/cardlist/";
+        private readonly string _url;
+        private readonly Option _option;
+        private readonly string _cachePath;
         private const string ExpansionRegex = @"showExpansionDetail\('(\d+)',''\)";
         private const string PageRegex = @"page\('(\d+)','\d+'\)";
+
+
+        public SerialDownloader(Option option, string cachePath, string url = @"http://ws-tcg.com/cardlist/")
+        {
+            if (url == null)
+                throw new ArgumentNullException(nameof(url));
+            _url = url;
+            _cachePath = cachePath;
+            _option = option;
+            if (!option.DisableCache && !Directory.Exists(_cachePath))
+                Directory.CreateDirectory(_cachePath);
+        }
 
         public IEnumerable<string> Download()
         {
             var web = new HtmlWeb();
-            var htmlDoc = web.Load(Url);
+            var htmlDoc = web.Load(_url);
             if (htmlDoc.ParseErrors != null && htmlDoc.ParseErrors.Any()) return null;
             var html = htmlDoc.DocumentNode.InnerHtml;
             var expansionSet = GetMatchRegex(html, ExpansionRegex).ToList();
@@ -28,13 +42,30 @@ namespace WsCardDatabaseBuilder.Download
             {
                 foreach (var no in expansionSet)
                 {
-                    serialSet.UnionWith(DowloadExpansion(no));
+                    var path = $@"{_cachePath}\{no}.txt";
+                    IList<string> serials;
+                    if (_option.SerialCache && File.Exists(path))
+                    {
+                        serials = ReadCache(path).ToList();
+                    }
+                    else
+                    {
+                        serials = DowloadExpansion(no).ToList();
+                        if(!_option.DisableCache)
+                            File.WriteAllLines(path, serials);
+                    }
+                    serialSet.UnionWith(serials);
                     progressBar.Report((double)++count / expansionSet.Count);
                 }
             }
             Console.WriteLine("Done.");
             serialSet.RemoveWhere(string.IsNullOrWhiteSpace);
             return serialSet;
+        }
+
+        private static IEnumerable<string> ReadCache(string path)
+        {
+            return File.ReadAllText(path).Split(new [] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
         }
 
         private static IEnumerable<string> DowloadExpansion(string expansionId)

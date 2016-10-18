@@ -5,11 +5,14 @@ namespace WsCardDatabaseBuilder
 {
     internal class Option
     {
-        [Option('f', "force", HelpText = "Force download ignore cache", Required = false, DefaultValue = false)]
-        public bool ForceDownload { get; set; }
-
-        [Option('c', "cache", HelpText = "Disable caching download data", Required = false, DefaultValue = false)]
+        [Option('d', "disablecache", HelpText = "Disable caching", Required = false, DefaultValue = false)]
         public bool DisableCache { get; set; }
+
+        [Option('c', "cardcache", HelpText = "Use cached card data", Required = false, DefaultValue = false)]
+        public bool CardCache { get; set; }
+
+        [Option('s', "serialcache", HelpText = "Use cached serial data", Required = false, DefaultValue = false)]
+        public bool SerialCache { get; set; }
 
         [Option('p', "path", HelpText = "Database output path", Required = false, DefaultValue = "wsdb.db")]
         public string OutputPath { get; set; }
