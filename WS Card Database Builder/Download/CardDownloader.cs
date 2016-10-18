@@ -33,17 +33,22 @@ namespace WsCardDatabaseBuilder.Download
         {
             Directory.CreateDirectory(_cachePath);
             var count = 0;
+            var setting = new JsonSerializerSettings { Formatting = Formatting.None };
             Console.Out.Write("Download cards...");
             using (var progressBar = new ProgressBar())
             {
                 foreach (var serial in serials)
                 {
-                    var fileName = serial.Replace("/", "").Replace("-", "");
-                    var path = $@"{_cachePath}\{fileName}.json";
+                    var parts = serial.Split(new[] {"/", "-","_"}, StringSplitOptions.RemoveEmptyEntries);
+                    var cacheFolder = Path.Combine(_cachePath, parts[1]);
+                    var fileName = $"{parts[2]}.json"; 
+                    var path = Path.Combine(cacheFolder, fileName);
+                    if (!_option.DisableCache && !Directory.Exists(cacheFolder))
+                        Directory.CreateDirectory(cacheFolder);
                     Card card;
-                    if (!_option.ForceDownload && File.Exists(path))
+                    if (_option.CardCache && File.Exists(path))
                     {
-                        card = JsonConvert.DeserializeObject<Card>(File.ReadAllText(path));
+                        card = JsonConvert.DeserializeObject<Card>(File.ReadAllText(path), setting) ;
                     }
                     else
                     {
@@ -141,6 +146,9 @@ namespace WsCardDatabaseBuilder.Download
                         break;
                     case "gate":
                         imgText = "ゲート";
+                        break;
+                    case "soul":
+                        imgText = "ソウル";
                         break;
                     default:
                         Console.WriteLine($"{serial}:Unknown Image");
