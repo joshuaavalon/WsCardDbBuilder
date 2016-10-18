@@ -5,20 +5,26 @@ This is a card database build tool for [Ws Deck Editor](https://gitlab.com/Group
 
 1. Download the latest release from [here](https://gitlab.com/GroupAvalon/WsCardDatabaseBuilder/tags).
 2. Unzip the file.
-3. Start the executable.
+3. Start the executable by `WSCDB -c`. Or use `WSCDB -c -s` for quick rebuild if you sure your serials are up-to-date.
 
 ## Parameter
-**Force Download**
-```
--f --force
-```
-This forces the program to ignore any cache data. All the data will be downloaded from internet.
-
 **Disable Caching**
 ```
--c --cache
+-d --disablecache
 ```
 By default, all the card data will be cached locally in the `Cache` directory in JSON format. This prevents the program from adding cache files but if there are cache data, it still read from it.
+
+**Use Card Cache**
+```
+-c --cardcache
+```
+Use cached card data if possible.
+
+**Use Serial Cache**
+```
+-s --serialcache
+```
+Use cached serial data if possible.
 
 **Output Path**
 ```
@@ -31,6 +37,13 @@ The output path of the database file. By default, it is `wsdb.db` in the same di
 -v --version [Version]
 ```
 Set the version number of the database. By default, it is 1.
+
+**Output Path**
+```
+-k --cachepath [Path]
+```
+Set the path of the cache directory.
+
 
 **Help**
 ```
