@@ -11,15 +11,13 @@ namespace WsCardDatabaseBuilder
 {
     internal class Program
     {
-        private const string CachePath = @"Cache\";
-
         private static void Main(string[] args)
         {
             var option = new Option();
             if (!Parser.Default.ParseArguments(args, option)) return;
             var serialDownloader = new SerialDownloader();
             var serials = serialDownloader.Download().ToList();
-            var cardDownloader = new CardDownloader(option, CachePath);
+            var cardDownloader = new CardDownloader(option, option.CachePath);
             var wsdb = new WsDatabase(option.OutputPath, option.Version);
             var nullList = new List<string>();
             wsdb.Save(cardDownloader.Download(serials, nullList));
