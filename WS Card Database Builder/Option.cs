@@ -20,6 +20,9 @@ namespace WsCardDatabaseBuilder
         [Option('v', "version", HelpText = "Version of database", Required = false, DefaultValue = 1)]
         public int Version { get; set; }
 
+        [Option('k', "cachepath", HelpText = "Cache path", Required = false, DefaultValue = "Cache")]
+        public string CachePath { get; set; }
+
         [HelpOption]
         public string GetUsage()
         {
