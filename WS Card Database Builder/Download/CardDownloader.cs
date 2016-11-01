@@ -164,11 +164,11 @@ namespace WsCardDatabaseBuilder.Download
                 fontNode.ParentNode.ReplaceChild(HtmlNode.CreateNode(fontNode.InnerText), fontNode);
             }
 
-            card.Text = textNode.InnerText.Trim();
+            card.Text = textNode.InnerText.Trim('\r', '\n');
 
             var flavorNode = tableNode.SelectSingleNode("//th[text()='フレーバー']/following-sibling::td");
             flavorNode.ReplaceBrNode();
-            card.Flavor = flavorNode.InnerText;
+            card.Flavor = flavorNode.InnerText.Trim('\r', '\n');
 
             var image = tableNode.SelectSingleNode("//td[@class='graphic']/img").GetAttributeValue("src", "").Trim();
             if (!image.Contains(@"http://ws-tcg.com"))
