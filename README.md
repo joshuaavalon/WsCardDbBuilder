@@ -1,5 +1,6 @@
 # Ws Card Database Builder
 [![Release](https://img.shields.io/github/release/joshuaavalon/WsCardDbBuilder.svg?style=flat)](https://github.com/joshuaavalon/WsCardDbBuilder/releases)
+[![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/joshuaavalon/WsCardDbBuilder/blob/master/LICENSE)
 
 This is a card database build tool for [Ws Deck Editor](https://github.com/joshuaavalon/WsDeckEditor).
 
