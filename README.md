@@ -1,4 +1,6 @@
 # Ws Card Database Builder
+[![Release](https://img.shields.io/github/release/joshuaavalon/WsCardDbBuilder.svg?style=flat)](https://github.com/joshuaavalon/WsCardDbBuilder/releases)
+
 This is a card database build tool for [Ws Deck Editor](https://github.com/joshuaavalon/WsDeckEditor).
 
 ## Quick Start
