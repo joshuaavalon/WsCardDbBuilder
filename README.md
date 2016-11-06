@@ -1,9 +1,9 @@
 # Ws Card Database Builder
-This is a card database build tool for [Ws Deck Editor](https://gitlab.com/GroupAvalon/WsDeckEditor).
+This is a card database build tool for [Ws Deck Editor](https://github.com/joshuaavalon/WsDeckEditor).
 
 ## Quick Start
 
-1. Download the latest release from [here](https://gitlab.com/GroupAvalon/WsCardDatabaseBuilder/tags).
+1. Download the latest release from [here](https://github.com/joshuaavalon/WsCardDbBuilder/releases).
 2. Unzip the file.
 3. Start the executable by `WSCDB -c`. Or use `WSCDB -c -s` for quick rebuild if you sure your serials are up-to-date.
 
