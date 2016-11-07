@@ -29,7 +29,7 @@ Use cached card data if possible.
 ```
 Use cached serial data if possible.
 
-**Output Path**
+**Database Output Path**
 ```
 -p --path [Path]
 ```
@@ -41,7 +41,7 @@ The output path of the database file. By default, it is `wsdb.db` in the same di
 ```
 Set the version number of the database. By default, it is 1.
 
-**Output Path**
+**Cache Output Path**
 ```
 -k --cachepath [Path]
 ```
