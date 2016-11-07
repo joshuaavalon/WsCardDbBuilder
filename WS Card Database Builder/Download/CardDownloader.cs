@@ -42,7 +42,7 @@ namespace WsCardDatabaseBuilder.Download
                 {
                     var parts = serial.Split(new[] {"/", "-", "_"}, StringSplitOptions.RemoveEmptyEntries);
                     var cacheFolder = Path.Combine(_cachePath, (parts[0] + parts[1]).Trim());
-                    var fileName = $"{parts[2].Trim()}.json";
+                    var fileName = $"{parts[2].Trim().Normalize(NormalizationForm.FormKC)}.json";
                     var path = Path.Combine(cacheFolder, fileName);
                     if (!_option.DisableCache && !Directory.Exists(cacheFolder))
                         Directory.CreateDirectory(cacheFolder);
