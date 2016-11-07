@@ -65,7 +65,7 @@ namespace WsCardDatabaseBuilder.Download
 
         private static IEnumerable<string> ReadCache(string path)
         {
-            return File.ReadAllText(path).Split(new [] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+            return File.ReadAllText(path).Split(new [] { "\r\n", "\n", "\r" }, StringSplitOptions.RemoveEmptyEntries);
         }
 
         private static IEnumerable<string> DowloadExpansion(string expansionId)
