@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using HtmlAgilityPack;
 using Newtonsoft.Json;
 using WsCardDatabaseBuilder.Model;
@@ -10,10 +11,11 @@ namespace WsCardDatabaseBuilder.Download
 {
     internal class CardDownloader
     {
+        private readonly string _cachePath;
+        private readonly Option _option;
         private readonly string _query;
         private readonly HtmlWeb _web;
-        private readonly Option _option;
-        private readonly string _cachePath;
+
         /// <summary>
         ///     Unwanted string to be removed.
         /// </summary>
@@ -33,35 +35,32 @@ namespace WsCardDatabaseBuilder.Download
         {
             Directory.CreateDirectory(_cachePath);
             var count = 0;
-            var setting = new JsonSerializerSettings { Formatting = Formatting.None };
             Console.Out.Write("Download cards...");
             using (var progressBar = new ProgressBar())
             {
                 foreach (var serial in serials)
                 {
-                    var parts = serial.Split(new[] {"/", "-","_"}, StringSplitOptions.RemoveEmptyEntries);
-                    var cacheFolder = Path.Combine(_cachePath, parts[1]);
-                    var fileName = $"{parts[2]}.json"; 
+                    var parts = serial.Split(new[] {"/", "-", "_"}, StringSplitOptions.RemoveEmptyEntries);
+                    var cacheFolder = Path.Combine(_cachePath, (parts[0] + parts[1]).Trim());
+                    var fileName = $"{parts[2].Trim()}.json";
                     var path = Path.Combine(cacheFolder, fileName);
                     if (!_option.DisableCache && !Directory.Exists(cacheFolder))
                         Directory.CreateDirectory(cacheFolder);
                     Card card;
                     if (_option.CardCache && File.Exists(path))
-                    {
-                        card = JsonConvert.DeserializeObject<Card>(File.ReadAllText(path), setting) ;
-                    }
+                        card = JsonConvert.DeserializeObject<Card>(File.ReadAllText(path));
                     else
                     {
                         card = Download(serial);
                         if (card != null && !_option.DisableCache)
-                            File.WriteAllText(path, JsonConvert.SerializeObject(card, Formatting.Indented));
+                            File.WriteAllText(path, JsonConvert.SerializeObject(card, Formatting.None));
                     }
 
                     if (card != null)
                         yield return card;
                     else
                         nullList.Add(serial);
-                    progressBar.Report((double)++count / serials.Count);
+                    progressBar.Report((double) ++count/serials.Count);
                 }
             }
             Console.WriteLine("Done.");
@@ -79,7 +78,7 @@ namespace WsCardDatabaseBuilder.Download
             if (tableNode == null) return null;
             card.Name = tableNode.SelectSingleNode("//th[@class='cell_1']/following-sibling::td/text()[1]")?
                 .InnerText.Trim();
-            card.Serial = tableNode.SelectSingleNode("//td[@class='cell_2']")?.InnerText?.Trim();
+            card.Serial = tableNode.SelectSingleNode("//td[@class='cell_2']")?.InnerText?.Trim().Normalize(NormalizationForm.FormKC);
             card.Rarity = tableNode.SelectSingleNode("//td[@class='cell_4']")?.InnerText?.Trim();
             card.Expansion = tableNode.SelectSingleNode("//th[text()='エクスパンション']/following-sibling::td")?
                 .InnerText.Trim();

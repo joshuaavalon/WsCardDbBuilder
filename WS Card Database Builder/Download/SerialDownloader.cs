@@ -10,11 +10,11 @@ namespace WsCardDatabaseBuilder.Download
 {
     internal class SerialDownloader
     {
-        private readonly string _url;
-        private readonly Option _option;
-        private readonly string _cachePath;
         private const string ExpansionRegex = @"showExpansionDetail\('(\d+)',''\)";
         private const string PageRegex = @"page\('(\d+)','\d+'\)";
+        private readonly string _cachePath;
+        private readonly Option _option;
+        private readonly string _url;
 
 
         public SerialDownloader(Option option, string cachePath, string url = @"http://ws-tcg.com/cardlist/")
@@ -51,11 +51,11 @@ namespace WsCardDatabaseBuilder.Download
                     else
                     {
                         serials = DowloadExpansion(no).ToList();
-                        if(!_option.DisableCache)
+                        if (!_option.DisableCache)
                             File.WriteAllLines(path, serials);
                     }
                     serialSet.UnionWith(serials);
-                    progressBar.Report((double)++count / expansionSet.Count);
+                    progressBar.Report((double) ++count/expansionSet.Count);
                 }
             }
             Console.WriteLine("Done.");
@@ -65,7 +65,7 @@ namespace WsCardDatabaseBuilder.Download
 
         private static IEnumerable<string> ReadCache(string path)
         {
-            return File.ReadAllText(path).Split(new [] { "\r\n", "\n", "\r" }, StringSplitOptions.RemoveEmptyEntries);
+            return File.ReadAllText(path).Split(new[] {"\r\n", "\n", "\r"}, StringSplitOptions.RemoveEmptyEntries);
         }
 
         private static IEnumerable<string> DowloadExpansion(string expansionId)
@@ -90,7 +90,9 @@ namespace WsCardDatabaseBuilder.Download
             htmlDoc.LoadHtml(html);
             foreach (var node in htmlDoc.DocumentNode.SelectNodes("//tr/td[1]"))
             {
-                serialSet.Add(node.InnerText);
+                var serial = node.InnerText;
+                if(!serial.Contains("_") && serial.Contains("/"))
+                    serialSet.Add(serial);
             }
             return serialSet;
         }

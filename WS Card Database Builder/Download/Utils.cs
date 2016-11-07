@@ -45,11 +45,11 @@ namespace WsCardDatabaseBuilder.Download
         /// </summary>
         /// <param name="text">Text to be prased</param>
         /// <returns>Card type</returns>
-        public static Model.Type ParseType(this string text)
+        public static Type ParseType(this string text)
         {
             if (text.Equals("イベント"))
-                return Model.Type.Event;
-            return text.Equals("クライマックス") ? Model.Type.Climax : Model.Type.Character;
+                return Type.Event;
+            return text.Equals("クライマックス") ? Type.Climax : Type.Character;
         }
 
 

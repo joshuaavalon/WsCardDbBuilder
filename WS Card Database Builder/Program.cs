@@ -11,13 +11,14 @@ namespace WsCardDatabaseBuilder
     {
         private const string ExpansionPath = @"Expansion\";
         private const string CardPath = @"Card\";
+
         private static void Main(string[] args)
         {
             var option = new Option();
             if (!Parser.Default.ParseArguments(args, option)) return;
             if (!option.DisableCache && !Directory.Exists(option.CachePath))
                 Directory.CreateDirectory(option.CachePath);
-            var serialDownloader = new SerialDownloader(option,Path.Combine(option.CachePath, ExpansionPath));
+            var serialDownloader = new SerialDownloader(option, Path.Combine(option.CachePath, ExpansionPath));
             var serials = serialDownloader.Download().ToList();
             var cardDownloader = new CardDownloader(option, Path.Combine(option.CachePath, CardPath));
             var wsdb = new WsDatabase(option.OutputPath, option.Version);
